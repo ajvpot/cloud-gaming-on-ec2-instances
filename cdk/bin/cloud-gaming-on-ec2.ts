@@ -14,12 +14,16 @@ const GRID_SW_CERT_URL = 'https://nvidia-gaming.s3.amazonaws.com/GridSwCert-Arch
 const CHROME_URL = 'https://dl.google.com/tag/s/appname=Google%20Chrome&needsadmin=true&ap=x64-stable-statsdef_0&brand=GCEA/dl/chrome/install/googlechromestandaloneenterprise64.msi';
 const SEVEN_ZIP_URL = 'https://www.7-zip.org/a/7z2201-x64.msi';
 
+const CUDA_URL = 'https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda_12.1.0_531.14_windows.exe';
+const PYTHON_URL = 'https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe';
+const TD_URL = 'https://download.derivative.ca/TouchDesigner.2023.11760.exe';
+
 const EC2_KEYPAIR_NAME = 'CHANGE_ME';
 const VOLUME_SIZE_GIB = 200;
 const OPEN_PORTS = [8443];
 const ALLOW_INBOUND_CIDR = '0.0.0.0/0';
 const ACCOUNT_ID = 'CHANGE_ME';
-const REGION = 'eu-west-2';
+const REGION = 'us-west-2';
 
 new G4DNStack(app, 'CloudGamingsOnG4DN', {
   niceDCVDisplayDriverUrl: NICE_DCV_DISPLAY_DRIVER_URL,

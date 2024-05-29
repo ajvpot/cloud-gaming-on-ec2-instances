@@ -19,6 +19,11 @@ export interface BaseConfig extends cdk.StackProps {
     allowInboundCidr: string;
     associateElasticIp: boolean;
 
+    tdUrl: string;
+    pythonUrl: string;
+    cudaUrl: string;
+
+
 }
 
 export abstract class BaseEc2Stack extends cdk.Stack {
@@ -27,7 +32,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: BaseConfig) {
     super(scope, id, props);
     this.props = props;
-    const vpc = new ec2.Vpc(this, 'CloudGamingVPC', {
+    const vpc = new ec2.Vpc(this, 'CloudTDVPC', {
       ipAddresses: ec2.IpAddresses.cidr('10.0.0.0/16'),
       maxAzs: 1,
       subnetConfiguration: [
@@ -61,7 +66,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       actions: ['s3:GetObject', 's3:ListBucket'],
     }));
 
-    const launchTemplate = new ec2.CfnLaunchTemplate(this, 'GamingLaunchTemplate', {
+    const launchTemplate = new ec2.CfnLaunchTemplate(this, 'TDLaunchTemplate', {
       launchTemplateData: {
         keyName: props.ec2KeyName,
         instanceType: this.getInstanceType().toString(),
@@ -72,7 +77,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           groups: [securityGroup.securityGroupId],
         }],
       },
-      launchTemplateName: `GamingInstanceLaunchTemplate/${this.getInstanceType().toString()}`,
+      launchTemplateName: `TDInstanceLaunchTemplate/${this.getInstanceType().toString()}`,
     });
 
     const ec2Instance = new ec2.Instance(this, 'EC2Instance', {
@@ -82,20 +87,28 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       vpcSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC }),
       keyName: props.ec2KeyName,
       machineImage: this.getMachineImage(),
+
       blockDevices: [
         {
           deviceName: '/dev/sda1',
           volume: ec2.BlockDeviceVolume.ebs(props.volumeSizeGiB, {
             volumeType: ec2.EbsDeviceVolumeType.GP3,
+            iops: 16000,
+            //@ts-ignore lol it really works
+            throughput: 300,
           }),
+        },
+        {
+          deviceName: '/dev/nvme0n1',
+          volume: ec2.BlockDeviceVolume.ephemeral(0), // Ephemeral volume index 0
         },
       ],
       role: s3Read,
       init: ec2.CloudFormationInit.fromConfigSets({
         configSets: { 
           // Seperate configSets and specific order depending on EC2 Instance Type
-          NVIDIA: ['helpersPreinstall', 'nvidia', 'nvidiadcv', 'reboot'],
-          AMD: ['helpersPreinstall', 'amd', 'amddcv', 'reboot'],
+          NVIDIA: ['helpersPreinstall', 'nvidia', 'nvidiadcv', 'userspace', 'reboot'],
+          AMD: ['helpersPreinstall', 'amd', 'amddcv', 'userspace', 'reboot'],
         },
         configs: {
           helpersPreinstall: new ec2.InitConfig([
@@ -104,7 +117,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
             ec2.InitPackage.msi(this.props.chromeUrl, { key: '2-Install-Chrome-Enterprise-x64' }),
           ]),
           nvidiadcv: new ec2.InitConfig([
-            // Install NiceDCV #needs to updated with latest version in "cloud-gaming-on-ec2.ts" if a later version is released.
+            // Install NiceDCV #needs to updated with latest version in "cloud-td.ts" if a later version is released.
             // https://docs.aws.amazon.com/dcv/latest/adminguide/config-param-ref.html - target-fps	= 0 
             ec2.InitPackage.msi(this.props.niceDCVServerUrl, { key: '3-Install-NICEDCV-Server' }),
             ec2.InitPackage.msi(this.props.niceDCVDisplayDriverUrl, { key: '4-Install-NICEDCV-Display' }),
@@ -117,7 +130,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\connectivity" /v enable-quic-frontend /t REG_DWORD /d 1 /f', { key: '96-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
           ]),
           amddcv: new ec2.InitConfig([
-            // Install NiceDCV #needs to updated with latest version in "cloud-gaming-on-ec2.ts" if a later version is released.
+            // Install NiceDCV #needs to updated with latest version in "cloud-td.ts" if a later version is released.
             ec2.InitPackage.msi(this.props.niceDCVServerUrl, { key: '3-Install-NICEDCV-Server' }),
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\log\\level" /v log-level /t REG_SZ /d debug /f', { key: '91-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\display" /v target-fps /t REG_DWORD /d 0 /f', { key: '92-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
@@ -147,11 +160,29 @@ export abstract class BaseEc2Stack extends cdk.Stack {
             ec2.InitCommand.shellCommand('powershell.exe -Command "$InstallationFilesFolder = \'C:\\Users\\Administrator\\Desktop\\InstallationFiles\'; $Bucket = \'ec2-amd-windows-drivers\'; $KeyPrefix = \'latest\'; $Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1; foreach ($Object in $Objects) { $LocalFileName = $Object.Key; if ($LocalFileName -ne \'\' -and $Object.Size -ne 0) { $LocalFilePath = Join-Path $InstallationFilesFolder\\1_AMD_driver $LocalFileName; Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1;  Expand-Archive $LocalFilePath -DestinationPath $InstallationFilesFolder\\1_AMD_driver } }"', { key: '5-Download-AMD-Drivers', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('pnputil /add-driver C:\\Users\\Administrator\\Desktop\\InstallationFiles\\1_AMD_driver\\Packages\\Drivers\\Display\\WT6A_INF\\*.inf /install /reboot', { key: '6-Install-AMD-Drivers', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
           ]),
+          userspace: new ec2.InitConfig([
+            ec2.InitFile.fromUrl('C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\parsec.zip', 'https://github.com/ajvpot/Parsec-Cloud-Preparation-Tool/archive/master.zip'),
+
+            ec2.InitCommand.shellCommand(`powershell.exe -Command "Expand-Archive 'C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\parsec.zip' -DestinationPath 'C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\parsec' -Force; CD C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\parsec\\Parsec-Cloud-Preparation-Tool-master; powershell.exe .\\Loader.ps1 -DontPromptPasswordUpdateGPU"`, { key: '90-user-parsec-prep', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+
+            ec2.InitFile.fromUrl('C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\cuda.exe', this.props.cudaUrl),
+            ec2.InitFile.fromUrl('C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\python.exe', this.props.pythonUrl),
+            ec2.InitFile.fromUrl('C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\td.exe', this.props.tdUrl),
+            ec2.InitFile.fromUrl('C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\ndi.exe', 'https://downloads.ndi.tv/Tools/NDI%206%20Tools.exe'),
+
+            ec2.InitCommand.shellCommand(`powershell.exe -Command "Start-Process -FilePath 'C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\cuda.exe' -ArgumentList '-s' -Wait -NoNewWindow"`, { key: '91-user-cuda', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            ec2.InitCommand.shellCommand(`"C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\python.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0"`, { key: '92-user-python', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            ec2.InitCommand.shellCommand(`"C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\td.exe" /VERYSILENT /Codemeter"`, { key: '93-user-td', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            ec2.InitCommand.shellCommand(`powershell.exe -Command "Rename-Computer -NewName CLOUD-TD"`, { key: '94-user-rename', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            //ec2.InitCommand.shellCommand(`"C:\\Users\\Administrator\\Desktop\\InstallationFiles\\9_user\\ndi.exe" /VERYSILENT "/LOADINF=ndiconfig"`, { key: '93-user-ndi', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
+            //ec2.InitPackage.msi('https://pkgs.tailscale.com/stable/tailscale-setup-1.66.4-amd64.msi', { key: '94-install-tailscale' }),
+
+          ]),
           reboot: new ec2.InitConfig([
             // Command to reboot instance and apply registry changes.
-            ec2.InitCommand.shellCommand('powershell.exe -Command Restart-Computer -force', { key: '92-restart', waitAfterCompletion: ec2.InitCommandWaitDuration.forever() }),
-            ec2.InitCommand.shellCommand('"C:\\Program Files\\NICE\\DCV\\Server\\bin\\dcv.exe" list-sessions"', { key: '93-check', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(5)) }),
-            ec2.InitCommand.shellCommand(`cfn-signal.exe -e %ERRORLEVEL% --resource EC2Instance --stack ${this.stackId} --region ${this.region}`, { key: '94-Signal', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(5)) }),
+            ec2.InitCommand.shellCommand('powershell.exe -Command Restart-Computer -force', { key: '99-restart', waitAfterCompletion: ec2.InitCommandWaitDuration.forever() }),
+            ec2.InitCommand.shellCommand('"C:\\Program Files\\NICE\\DCV\\Server\\bin\\dcv.exe" list-sessions"', { key: '991-check', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(5)) }),
+            ec2.InitCommand.shellCommand(`cfn-signal.exe -e %ERRORLEVEL% --resource EC2Instance --stack ${this.stackId} --region ${this.region}`, { key: '992-Signal', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(5)) }),
           ]),
         },
       }),
@@ -160,7 +191,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
         configSets: [this.getGpuType()],
 
         // Optional, how long the installation is expected to take (5 minutes by default)
-        timeout: cdk.Duration.minutes(15),
+        timeout: cdk.Duration.minutes(30),
 
         // Optional, whether to include the --url argument when running cfn-init and cfn-signal commands (false by default)
         includeUrl: true,
@@ -168,13 +199,13 @@ export abstract class BaseEc2Stack extends cdk.Stack {
         // Optional, whether to include the --role argument when running cfn-init and cfn-signal commands (false by default)
         // includeRole: true,
       },
-      instanceName: `GamingInstance/${this.getInstanceType().toString()}`,
+      instanceName: `TDInstance/${this.getInstanceType().toString()}`,
     });
     // Needed as cdk created hashed LogicalID and CFN signal does not work after reboot, so we have to hardcode the Logical Name in the signal (line #136)
     ec2Instance.instance.overrideLogicalId('EC2Instance');
 
     if (this.props.associateElasticIp) {
-      const elasticIp = new ec2.CfnEIP(this, 'Gaming', {
+      const elasticIp = new ec2.CfnEIP(this, 'TD', {
         instanceId: ec2Instance.instanceId,
       });
 

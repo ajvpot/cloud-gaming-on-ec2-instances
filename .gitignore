@@ -14,6 +14,7 @@ cdk.out
 /cdk.context.json
 .idea
 /cdk/cdk.context.json
+/cdk/GamingOnEc2.pem
 
 cloud-gaming-on-ec2-instances.iml
 keys

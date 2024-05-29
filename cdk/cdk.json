@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node bin/cloud-gaming-on-ec2.ts",
+  "app": "npx ts-node bin/cloud-td.ts",
   "context": {
     "aws-cdk:enableDiffNoFail": "true",
     "@aws-cdk/core:stackRelativeExports": "true",

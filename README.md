@@ -42,7 +42,7 @@ Navigate into `cdk` folder it and run `npm install`
 
 #### 4. Configure your environment
 
-Before you can deploy the stack, you need to review the config. Navigate to `cdk/bin/cloud-gaming-on-ec2.ts` and review / update the following parameters:
+Before you can deploy the stack, you need to review the config. Navigate to `cdk/bin/cloud-td.ts` and review / update the following parameters:
 
 - `ACCOUNT`: The account id you want to deploy the stack in
 - `REGION`: The region you want to deploy the stack in
@@ -135,6 +135,12 @@ cdk deploy --all --no-rollback --concurrency=3 --require-approval=never
 List all stacks
 ```
 cdk list
+```
+
+
+```powershell
+Get-Content -Path C:\cfn\log\cfn-init.log -Wait
+
 ```
 
 ## Security

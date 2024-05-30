@@ -1,7 +1,16 @@
-import AWS from "aws-sdk";
+import {
+  EC2Client,
+  StartInstancesCommand,
+  StopInstancesCommand,
+  DescribeInstanceStatusCommand,
+} from "@aws-sdk/client-ec2";
+import {
+  CloudFormationClient,
+  DescribeStackResourcesCommand,
+} from "@aws-sdk/client-cloudformation";
 
-const ec2 = new AWS.EC2({ region: process.env.AWS_REGION });
-const cloudformation = new AWS.CloudFormation({
+const ec2Client = new EC2Client({ region: process.env.AWS_REGION });
+const cloudFormationClient = new CloudFormationClient({
   region: process.env.AWS_REGION,
 });
 
@@ -10,9 +19,8 @@ async function getInstanceIdsFromStack(stackName: string): Promise<string[]> {
     StackName: stackName,
   };
 
-  const stackResources = await cloudformation
-    .describeStackResources(params)
-    .promise();
+  const command = new DescribeStackResourcesCommand(params);
+  const stackResources = await cloudFormationClient.send(command);
   if (!stackResources.StackResources) {
     return [];
   }
@@ -34,7 +42,8 @@ export async function startInstances(stackName: string): Promise<void> {
     InstanceIds: instanceIds,
   };
 
-  await ec2.startInstances(params).promise();
+  const command = new StartInstancesCommand(params);
+  await ec2Client.send(command);
 }
 
 export async function stopInstances(stackName: string): Promise<void> {
@@ -45,7 +54,8 @@ export async function stopInstances(stackName: string): Promise<void> {
     InstanceIds: instanceIds,
   };
 
-  await ec2.stopInstances(params).promise();
+  const command = new StopInstancesCommand(params);
+  await ec2Client.send(command);
 }
 
 export async function getInstanceStatuses(
@@ -58,7 +68,8 @@ export async function getInstanceStatuses(
     InstanceIds: instanceIds,
   };
 
-  const statuses = await ec2.describeInstanceStatus(params).promise();
+  const command = new DescribeInstanceStatusCommand(params);
+  const statuses = await ec2Client.send(command);
   if (!statuses.InstanceStatuses) {
     return [];
   }

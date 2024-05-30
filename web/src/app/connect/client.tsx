@@ -125,7 +125,7 @@ function Client() {
         justifyContent: "center",
       }}
     >
-      <form>
+      <form style={{ display: "none" }}>
         <fieldset>
           {Object.keys(credentials).map((cred) => (
             <input

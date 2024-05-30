@@ -47,6 +47,7 @@ export default function Home() {
     fetchStatuses();
   }, []);
 
+  // TODO MAKE THESE WORK ON SPECIFIC INSTANCES
   const handleAction = async (action: "start" | "stop") => {
     setLoading(true);
     setMessage("");
@@ -145,7 +146,7 @@ export default function Home() {
                     )}
                     <Button
                       color="danger"
-                      onClick={() => handleAction("stop", status.instanceId)}
+                      onClick={() => handleAction("stop")}
                       disabled={loading}
                     >
                       Stop
@@ -154,7 +155,7 @@ export default function Home() {
                 ) : (
                   <Button
                     color="success"
-                    onClick={() => handleAction("start", status.instanceId)}
+                    onClick={() => handleAction("start")}
                     disabled={loading}
                   >
                     Start

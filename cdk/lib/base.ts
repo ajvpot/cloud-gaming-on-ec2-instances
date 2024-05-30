@@ -31,7 +31,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     super(scope, id, props);
     this.props = props;
 
-    const vpc = new ec2.Vpc(this, "CloudTDVPC", {
+    const vpc = new ec2.Vpc(this, `${id}VPC`, {
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
       maxAzs: 1,
       subnetConfiguration: [
@@ -43,7 +43,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       ],
     });
 
-    const securityGroup = new ec2.SecurityGroup(this, "SecurityGroup", {
+    const securityGroup = new ec2.SecurityGroup(this, `${id}SecurityGroup`, {
       vpc,
       description: "NICE DCV access",
       securityGroupName: "InboundAccessFromDcv",
@@ -80,27 +80,28 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       }),
     );
 
-    const launchTemplate = new ec2.CfnLaunchTemplate(this, "TDLaunchTemplate", {
-      launchTemplateData: {
-        keyName: props.ec2KeyName,
-        instanceType: this.getInstanceType().toString(),
-        networkInterfaces: [
-          {
-            subnetId: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC })
-              .subnetIds[0],
-            deviceIndex: 0,
-            description: "ENI",
-            groups: [securityGroup.securityGroupId],
-          },
-        ],
-        hibernationOptions: {
-          configured: true,
+    const launchTemplate = new ec2.CfnLaunchTemplate(
+      this,
+      `${id}LaunchTemplate`,
+      {
+        launchTemplateData: {
+          keyName: props.ec2KeyName,
+          instanceType: this.getInstanceType().toString(),
+          networkInterfaces: [
+            {
+              subnetId: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC })
+                .subnetIds[0],
+              deviceIndex: 0,
+              description: "ENI",
+              groups: [securityGroup.securityGroupId],
+            },
+          ],
         },
+        launchTemplateName: `${id}InstanceLaunchTemplate/${this.getInstanceType().toString()}`,
       },
-      launchTemplateName: `${id}InstanceLaunchTemplate/${this.getInstanceType().toString()}`,
-    });
+    );
 
-    const ec2Instance = new ec2.Instance(this, "EC2Instance", {
+    const ec2Instance = new ec2.Instance(this, `${id}InstanceMain`, {
       instanceType: this.getInstanceType(),
       vpc,
       securityGroup,
@@ -512,7 +513,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
     ec2Instance.instance.overrideLogicalId("EC2Instance");
 
     if (this.props.associateElasticIp) {
-      const elasticIp = new ec2.CfnEIP(this, "TouchDesigner", {
+      const elasticIp = new ec2.CfnEIP(this, `${id}IP`, {
         instanceId: ec2Instance.instanceId,
       });
 

@@ -106,6 +106,8 @@ function Client() {
         baseUrl: BASE_URL,
         onDisconnect: handleDisconnect,
         logLevel: LOG_LEVEL,
+        highColorAccuracy: true,
+        clientHiDpiScaling: true,
       }}
       uiConfig={{
         toolbar: {

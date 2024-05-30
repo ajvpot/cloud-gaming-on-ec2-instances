@@ -1,5 +1,4 @@
 {
   "https://assets-oh3.pages.dev/dcvjs-esm/dcv.js": { "integrity": "sha512-hDXRaOFK7l3E3C78G2YrnhhQKjG3dSOXtxdhSlhaQEact2K2UuIY50A+HKRCWziUHqi4gzPAv1pgTCg9I5P7Ng==", "contentType": "text/javascript; charset=utf-8" },
-  "https://raw.githubusercontent.com/Stixor-Technologies/nice-dcv-web/main/dcvjs-esm/dcv.js": { "integrity": "sha512-hDXRaOFK7l3E3C78G2YrnhhQKjG3dSOXtxdhSlhaQEact2K2UuIY50A+HKRCWziUHqi4gzPAv1pgTCg9I5P7Ng==", "contentType": "text/plain; charset=utf-8" },
   "version": 1
 }

@@ -122,7 +122,10 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-gray-400 mb-2">
-                IP Address: {status.publicIp}
+                IP Address:{" "}
+                <a href={`https://${status.publicIp}:8443`}>
+                  {status.publicIp}
+                </a>
               </p>
               <p className="text-gray-400 mb-4">
                 {status.state === "running"

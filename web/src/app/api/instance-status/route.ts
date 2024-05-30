@@ -3,10 +3,10 @@ import { getInstanceStatuses } from "@/lib/ec2Actions";
 
 export async function GET() {
   try {
-    const stackName = process.env.AWS_STACK_NAME;
+    const stackName = process.env.STACK_NAME;
     if (!stackName) {
       return NextResponse.json(
-        { error: "AWS_STACK_NAME is not set" },
+        { error: "STACK_NAME is not set" },
         { status: 400 },
       );
     }

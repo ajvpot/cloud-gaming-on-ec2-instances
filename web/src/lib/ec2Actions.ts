@@ -5,6 +5,7 @@ import {
   StartInstancesCommand,
   StopInstancesCommand,
   DescribeInstanceStatusCommand,
+  DescribeInstancesCommand,
 } from "@aws-sdk/client-ec2";
 import {
   CloudFormationClient,
@@ -70,29 +71,33 @@ export async function stopInstances(stackName: string): Promise<void> {
   await ec2Client.send(command);
 }
 
-export async function getInstanceStatuses(
-  stackName: string,
-): Promise<{ instanceId: string; state: string }[]> {
+export async function getInstanceStatuses(stackName: string) {
   const instanceIds = await getInstanceIdsFromStack(stackName);
   if (instanceIds.length === 0) return [];
 
-  const params = {
-    InstanceIds: instanceIds,
-    IncludeAllInstances: true,
-  };
+  const instanceStatuses: {
+    instanceId: string;
+    state: string;
+    publicIp?: string;
+  }[] = [];
 
-  const command = new DescribeInstanceStatusCommand(params);
-  const statuses = await ec2Client.send(command);
-  if (!statuses.InstanceStatuses) {
-    return [];
+  for (let instanceId of instanceIds) {
+    const instanceCommand = new DescribeInstancesCommand({
+      InstanceIds: [instanceId],
+    });
+    const instanceData = await ec2Client.send(instanceCommand);
+    const instance = instanceData.Reservations?.[0].Instances?.[0];
+    if (instance) {
+      const elasticIp = instance.NetworkInterfaces?.[0]?.Association?.PublicIp;
+      instanceStatuses.push({
+        instanceId: instance.InstanceId!,
+        state: instance.State?.Name || "unknown",
+        publicIp: elasticIp || instance.PublicIpAddress,
+      });
+    }
   }
 
-  return statuses.InstanceStatuses.map((status) => ({
-    instanceId: status.InstanceId!,
-    state: status.InstanceState?.Name || "unknown",
-  })).filter(
-    (status) => status.instanceId !== undefined && status.state !== undefined,
-  );
+  return instanceStatuses;
 }
 
 // Function to get the encrypted password data

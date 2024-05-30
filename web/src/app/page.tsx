@@ -7,6 +7,7 @@ import { getPassword, startEC2Instances, stopEC2Instances } from "./actions";
 interface InstanceStatus {
   instanceId: string;
   state: string;
+  publicIp?: string;
   password?: string;
 }
 
@@ -103,22 +104,23 @@ export default function Home() {
       <ul className="list-disc list-inside space-y-2">
         {statuses.map((status) => (
           <li key={status.instanceId} className="text-gray-700">
-            {status.instanceId}: {status.state}
-            {(status.password && (
+            {status.instanceId}@{status.publicIp}: {status.state}
+            {status.password ? (
               <>
                 <p>Password: {status.password}</p>
-
-                <a
-                  href={`/connect#${encodeToUrlParams({
-                    username: "Administrator",
-                    server: `https://35.82.217.196:8443`,
-                    password: status.password,
-                  })}`}
-                >
-                  Connect
-                </a>
+                {status.publicIp && (
+                  <a
+                    href={`/connect#${encodeToUrlParams({
+                      username: "Administrator",
+                      server: `https://${status.publicIp}:8443`,
+                      password: status.password,
+                    })}`}
+                  >
+                    Connect
+                  </a>
+                )}
               </>
-            )) || (
+            ) : (
               <button onClick={() => handleGetPassword(status.instanceId)}>
                 Get Password
               </button>

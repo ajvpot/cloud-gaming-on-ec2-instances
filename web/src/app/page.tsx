@@ -3,6 +3,7 @@
 import { Button } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { getPassword, startEC2Instances, stopEC2Instances } from "./actions";
+import { useRouter } from "next/navigation";
 
 interface InstanceStatus {
   instanceId: string;
@@ -29,6 +30,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [statuses, setStatuses] = useState<InstanceStatus[]>([]);
+
+  const router = useRouter();
 
   const fetchStatuses = async () => {
     try {
@@ -65,6 +68,20 @@ export default function Home() {
     }
   };
 
+  const handleConnect = async (instanceId: string) => {
+    const status = statuses.find((status) => status.instanceId === instanceId);
+    const password = await handleGetPassword(instanceId);
+    if (status && password) {
+      router.push(
+        `/connect#${encodeToUrlParams({
+          username: "Administrator",
+          server: `https://${status.publicIp}:8443`,
+          password: password,
+        })}`,
+      );
+    }
+  };
+
   const handleGetPassword = async (instanceId: string) => {
     const res = await getPassword(instanceId);
 
@@ -77,61 +94,77 @@ export default function Home() {
             : status,
         ),
       );
+      return res.password;
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-xl shadow-md space-y-4">
-      <h1 className="text-2xl font-bold text-center">EC2 Control</h1>
-      <div className="flex justify-center space-x-4">
-        <button
-          onClick={() => handleAction("start")}
-          disabled={loading}
-          className={`px-4 py-2 bg-green-500 text-white rounded-md ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"}`}
-        >
-          Start Instances
-        </button>
-        <button
-          onClick={() => handleAction("stop")}
-          disabled={loading}
-          className={`px-4 py-2 bg-red-500 text-white rounded-md ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-red-600"}`}
-        >
-          Stop Instances
-        </button>
-      </div>
-      {message && <p className="text-center text-gray-700">{message}</p>}
-      <h2 className="text-xl font-semibold">Instance Statuses</h2>
-      <ul className="list-disc list-inside space-y-2">
-        {statuses.map((status) => (
-          <li key={status.instanceId} className="text-gray-700">
-            <a href={`https://${status.publicIp}:8443`}>{status.publicIp}</a>:{" "}
-            {status.state}
-            {status.password ? (
-              <>
-                <p>Password: {status.password}</p>
-                <p>
-                  {status.publicIp && (
-                    <a
-                      className="text-blue-500"
-                      href={`/connect#${encodeToUrlParams({
-                        username: "Administrator",
-                        server: `https://${status.publicIp}:8443`,
-                        password: status.password,
-                      })}`}
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-950 text-white">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-md max-w-4xl w-full">
+        <div className="text-center space-y-4 mb-8">
+          <h2 className="text-2xl font-bold">Virtual Workstation Management</h2>
+          <p className="text-gray-400">
+            Start, stop, and connect to your virtual workstations.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {statuses.map((status) => (
+            <div key={status.instanceId} className="bg-gray-800 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-medium">
+                  Workstation {status.instanceId}
+                </h3>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${status.state === "running" ? "bg-green-500" : status.state === "stopped" ? "bg-red-500" : "bg-yellow-500"} text-white`}
+                >
+                  {status.state.charAt(0).toUpperCase() + status.state.slice(1)}
+                </span>
+              </div>
+              <p className="text-gray-400 mb-2">
+                IP Address: {status.publicIp}
+              </p>
+              <p className="text-gray-400 mb-4">
+                {status.state === "running"
+                  ? "This virtual workstation is currently running and available for use."
+                  : status.state === "stopped"
+                    ? "This virtual workstation is currently offline and not available for use."
+                    : "This virtual workstation is currently in a pending state and may not be available for use."}
+              </p>
+              <div className="flex justify-end space-x-2">
+                {status.state === "running" || status.state === "pending" ? (
+                  <>
+                    {status.password ? (
+                      <>Loading...</>
+                    ) : (
+                      <Button
+                        color="primary"
+                        onClick={() => handleConnect(status.instanceId)}
+                      >
+                        Connect
+                      </Button>
+                    )}
+                    <Button
+                      color="danger"
+                      onClick={() => handleAction("stop", status.instanceId)}
+                      disabled={loading}
                     >
-                      Connect
-                    </a>
-                  )}
-                </p>
-              </>
-            ) : (
-              <Button onClick={() => handleGetPassword(status.instanceId)}>
-                Get Password
-              </Button>
-            )}
-          </li>
-        ))}
-      </ul>
+                      Stop
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    color="success"
+                    onClick={() => handleAction("start", status.instanceId)}
+                    disabled={loading}
+                  >
+                    Start
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

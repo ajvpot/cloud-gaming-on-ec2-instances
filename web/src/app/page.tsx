@@ -104,7 +104,8 @@ export default function Home() {
       <ul className="list-disc list-inside space-y-2">
         {statuses.map((status) => (
           <li key={status.instanceId} className="text-gray-700">
-            {status.instanceId}@{status.publicIp}: {status.state}
+            <a href={`https://${status.publicIp}:8443`}>{status.publicIp}</a>:{" "}
+            {status.state}
             {status.password ? (
               <>
                 <p>Password: {status.password}</p>

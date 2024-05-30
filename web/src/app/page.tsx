@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Spacer, Progress } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { getPassword, startEC2Instances, stopEC2Instances } from "./actions";
 
@@ -108,22 +108,25 @@ export default function Home() {
             {status.password ? (
               <>
                 <p>Password: {status.password}</p>
-                {status.publicIp && (
-                  <a
-                    href={`/connect#${encodeToUrlParams({
-                      username: "Administrator",
-                      server: `https://${status.publicIp}:8443`,
-                      password: status.password,
-                    })}`}
-                  >
-                    Connect
-                  </a>
-                )}
+                <p>
+                  {status.publicIp && (
+                    <a
+                      className="text-blue-500"
+                      href={`/connect#${encodeToUrlParams({
+                        username: "Administrator",
+                        server: `https://${status.publicIp}:8443`,
+                        password: status.password,
+                      })}`}
+                    >
+                      Connect
+                    </a>
+                  )}
+                </p>
               </>
             ) : (
-              <button onClick={() => handleGetPassword(status.instanceId)}>
+              <Button onClick={() => handleGetPassword(status.instanceId)}>
                 Get Password
-              </button>
+              </Button>
             )}
           </li>
         ))}

@@ -11,6 +11,47 @@ import useHash from "@/lib/useHash";
 const LOG_LEVEL = dcv.LogLevel.INFO;
 const BASE_URL = "https://assets-oh3.pages.dev/dcvjs-esm/";
 
+const DEFAULT_SETTINGS = {
+  sessionId: "",
+  authToken: "",
+  extensionData: "",
+  promptReconnect: true,
+  logLevel: "info",
+  wss: true,
+  enabledChannels: [],
+  customChannels: [],
+  displayCodecs: [],
+  enableQU: true,
+  minQuality: 30,
+  maxQuality: 0,
+  maxDisplayWidth: 0,
+  maxDisplayHeight: 0,
+  minDisplayWidth: 640,
+  minDisplayHeight: 480,
+  debugLayer: false,
+  enableGraphicsDebugLayer: true,
+  clientHiDpiScaling: false,
+  enableWebCodecs: true,
+  losslessColorspace: "rgb",
+  dynamicResolution: true,
+  enableShortcutEditor: false,
+  scaleToFit: false,
+  volume: 100,
+  microphone: false,
+  webcam: false,
+  macOptionToAlt: true,
+  macCommandToControl: false,
+  appearanceMode: "System default",
+  toolbarBehavior: "Auto-hide toolbar only in full screen",
+  displayQuality: "Best responsiveness",
+  metricsEnabled: false,
+  selectedResolution: "adaptive",
+  selectedWebcamId: null,
+  highColorAccuracy: true,
+  forceKeyboardCombinations: false,
+  timezoneRedirectionEnabled: true,
+};
+
 let auth: any;
 
 function Client() {
@@ -106,8 +147,6 @@ function Client() {
         baseUrl: BASE_URL,
         onDisconnect: handleDisconnect,
         logLevel: LOG_LEVEL,
-        highColorAccuracy: true,
-        clientHiDpiScaling: true,
       }}
       uiConfig={{
         toolbar: {

@@ -12,10 +12,8 @@ permissions: write-all
 
 jobs:
   build:
-    runs-on: self-hosted
     permissions: write-all
-    container:
-      image: ubuntu
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -10,9 +10,9 @@ import useHash from "@/lib/useHash";
 const LOG_LEVEL = dcv.LogLevel.INFO;
 const BASE_URL = "https://assets-oh3.pages.dev/dcvjs-esm/";
 
-function Client() {
-  let auth: any;
+let auth: any;
 
+function Client() {
   const [hashData, setHash] = useHash();
 
   const [authenticated, setAuthenticated] = React.useState(false);
@@ -48,10 +48,7 @@ function Client() {
       )
     ) {
       console.log("We have all the credentials requested.");
-      submitCredentials({
-        // lol 3p code is not good
-        e: () => {},
-      });
+      auth.sendCredentials(credentials);
       return;
     }
     let requestedCredentials = {};

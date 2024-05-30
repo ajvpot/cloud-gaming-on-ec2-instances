@@ -10,6 +10,20 @@ interface InstanceStatus {
   password?: string;
 }
 
+function encodeToUrlParams(record: Record<string, any>): string {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(record)) {
+    if (Array.isArray(value)) {
+      value.forEach((val) => params.append(key, val.toString()));
+    } else {
+      params.append(key, value.toString());
+    }
+  }
+
+  return params.toString();
+}
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -93,7 +107,21 @@ export default function Home() {
             <button onClick={() => handleGetPassword(status.instanceId)}>
               Get Password
             </button>
-            {status.password && <p>Password: {status.password}</p>}
+            {status.password && (
+              <>
+                <p>Password: {status.password}</p>
+
+                <a
+                  href={`/connect#${encodeToUrlParams({
+                    username: "Administrator",
+                    server: `https://35.82.217.196:8443`,
+                    password: status.password,
+                  })}`}
+                >
+                  Connect
+                </a>
+              </>
+            )}
           </li>
         ))}
       </ul>

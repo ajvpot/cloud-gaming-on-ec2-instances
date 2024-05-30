@@ -8,8 +8,8 @@ import { G5Stack } from '../lib/g5';
 const app = new cdk.App();
 
 const NICE_DCV_DISPLAY_DRIVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-virtual-display-x64-Release.msi';
-//const NICE_DCV_SERVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-server-x64-Release.msi'; need to dive deeper into why the latest version stops working.
-const NICE_DCV_SERVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi';              
+const NICE_DCV_SERVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-server-x64-Release.msi';
+//const NICE_DCV_SERVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi'; // known good
 const GRID_SW_CERT_URL = 'https://nvidia-gaming.s3.amazonaws.com/GridSwCert-Archive/GridSwCertWindows_2021_10_2.cert';
 const CHROME_URL = 'https://dl.google.com/tag/s/appname=Google%20Chrome&needsadmin=true&ap=x64-stable-statsdef_0&brand=GCEA/dl/chrome/install/googlechromestandaloneenterprise64.msi';
 const SEVEN_ZIP_URL = 'https://www.7-zip.org/a/7z2201-x64.msi';
@@ -25,7 +25,7 @@ const ALLOW_INBOUND_CIDR = '0.0.0.0/0';
 const ACCOUNT_ID = '471112955109';
 const REGION = 'us-west-2';
 
-new G5Stack(app, 'CloudTD', {
+new G5Stack(app, 'CloudTD2', {
   niceDCVDisplayDriverUrl: NICE_DCV_DISPLAY_DRIVER_URL,
   niceDCVServerUrl: NICE_DCV_SERVER_URL,
   sevenZipUrl: SEVEN_ZIP_URL,

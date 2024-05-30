@@ -12,7 +12,6 @@ cdk.out
 # Parcel default cache directory
 .parcel-cache
 /cdk.context.json
-.idea
 /cdk/cdk.context.json
 /cdk/GamingOnEc2.pem
 

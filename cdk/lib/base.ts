@@ -93,11 +93,6 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       vpcSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC }),
       keyName: props.ec2KeyName,
       machineImage: this.getMachineImage(),
-
-      hibernationOptions: {
-        configured: true,
-      },
-
       blockDevices: [
         {
           deviceName: '/dev/sda1',

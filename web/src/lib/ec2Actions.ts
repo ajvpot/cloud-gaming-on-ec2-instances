@@ -9,9 +9,19 @@ import {
   DescribeStackResourcesCommand,
 } from "@aws-sdk/client-cloudformation";
 
-const ec2Client = new EC2Client({ region: process.env.AWS_REGION });
+const ec2Client = new EC2Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+  },
+});
 const cloudFormationClient = new CloudFormationClient({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
+  },
 });
 
 async function getInstanceIdsFromStack(stackName: string): Promise<string[]> {
@@ -66,6 +76,7 @@ export async function getInstanceStatuses(
 
   const params = {
     InstanceIds: instanceIds,
+    IncludeAllInstances: true,
   };
 
   const command = new DescribeInstanceStatusCommand(params);

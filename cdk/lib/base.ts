@@ -80,7 +80,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           groups: [securityGroup.securityGroupId],
         }],
       },
-      launchTemplateName: `TDInstanceLaunchTemplate/${this.getInstanceType().toString()}`,
+      launchTemplateName: `${id}InstanceLaunchTemplate/${this.getInstanceType().toString()}`,
     });
 
     const ec2Instance = new ec2.Instance(this, 'EC2Instance', {
@@ -205,7 +205,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
         // Optional, whether to include the --role argument when running cfn-init and cfn-signal commands (false by default)
         // includeRole: true,
       },
-      instanceName: `TouchDesigner/${this.getInstanceType().toString()}`,
+      instanceName: `${id}/${this.getInstanceType().toString()}`,
     });
     // Needed as cdk created hashed LogicalID and CFN signal does not work after reboot, so we have to hardcode the Logical Name in the signal (line #136)
     ec2Instance.instance.overrideLogicalId('EC2Instance');

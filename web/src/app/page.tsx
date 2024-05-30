@@ -131,7 +131,7 @@ export default function Home() {
                 {status.state === "running"
                   ? "This virtual workstation is currently running and available for use."
                   : status.state === "stopped"
-                    ? "This virtual workstation is currently offline and not available for use."
+                    ? "This virtual workstation is currently offline."
                     : "This virtual workstation is currently in a pending state and may not be available for use."}
               </p>
               <div className="flex justify-end space-x-2">

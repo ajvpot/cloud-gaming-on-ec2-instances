@@ -142,6 +142,11 @@ function Client() {
           Login
         </button>
       </form>
+      <p>
+        You may have to{" "}
+        <a href={SERVER_URL}>accept the Unsigned SSL Cert here</a> before
+        connecting.
+      </p>
     </div>
   );
 }

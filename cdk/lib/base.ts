@@ -94,6 +94,10 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       keyName: props.ec2KeyName,
       machineImage: this.getMachineImage(),
 
+      hibernationOptions: {
+        configured: true,
+      },
+
       blockDevices: [
         {
           deviceName: '/dev/sda1',
@@ -111,7 +115,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
       ],
       role: s3Read,
       init: ec2.CloudFormationInit.fromConfigSets({
-        configSets: { 
+        configSets: {
           // Seperate configSets and specific order depending on EC2 Instance Type
           NVIDIA: ['helpersPreinstall', 'nvidia', 'nvidiadcv', 'userspace', 'clean', 'reboot'],
           AMD: ['helpersPreinstall', 'amd', 'amddcv', 'userspace', 'clean', 'reboot'],
@@ -124,11 +128,11 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           ]),
           nvidiadcv: new ec2.InitConfig([
             // Install NiceDCV #needs to updated with latest version in "cloud-td.ts" if a later version is released.
-            // https://docs.aws.amazon.com/dcv/latest/adminguide/config-param-ref.html - target-fps	= 0 
+            // https://docs.aws.amazon.com/dcv/latest/adminguide/config-param-ref.html - target-fps	= 0
             ec2.InitPackage.msi(this.props.niceDCVServerUrl, { key: '3-Install-NICEDCV-Server' }),
             ec2.InitPackage.msi(this.props.niceDCVDisplayDriverUrl, { key: '4-Install-NICEDCV-Display' }),
             ec2.InitCommand.shellCommand('reg add "HKLM\\SYSTEM\\CurrentControlSet\\Services\\nvlddmkm\\Global" /v vGamingMarketplace /t REG_DWORD /d 2', { key: '9-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
-            ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\log\\level" /v log-level /t REG_SZ /d debug /f', { key: '91-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),            
+            ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\log\\level" /v log-level /t REG_SZ /d debug /f', { key: '91-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\display" /v target-fps /t REG_DWORD /d 0 /f', { key: '92-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\display" /v enable-qu /t REG_DWORD /d 0 /f', { key: '93-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('reg add "HKEY_USERS\\S-1-5-18\\Software\\GSettings\\com\\nicesoftware\\dcv\\display" /v frame-queue-weights /t REG_DWORD /d 851 /f', { key: '94-Add-Reg', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
@@ -159,7 +163,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
             ec2.InitCommand.shellCommand('Powershell.exe -Command "C:\\Windows\\System32\\DriverStore\\FileRepository\\nvg*\\nvidia-smi.exe -e 0"', { key: '9-Disable-ECC-Checking', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             ec2.InitCommand.shellCommand('Powershell.exe -Command "C:\\Windows\\System32\\DriverStore\\FileRepository\\nvg*\\nvidia-smi.exe -ac 6250,1710"', { key: '910-Clock-Speed', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
             //ec2.InitCommand.shellCommand('Powershell.exe -Command "C:\\Windows\\System32\\DriverStore\\FileRepository\\nvg*\\nvidia-smi.exe -ac 5001,1590"', { key: '910-Clock-Speed', waitAfterCompletion: ec2.InitCommandWaitDuration.of(cdk.Duration.seconds(0)) }),
-            
+
           ]),
           amd: new ec2.InitConfig([
             // Command to download and install latest AMD drivers.

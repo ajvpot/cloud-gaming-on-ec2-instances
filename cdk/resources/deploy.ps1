@@ -34,9 +34,11 @@ $Bucket = "nvidia-gaming"
 $KeyPrefix = "windows/latest"
 $Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
 
-foreach ($Object in $Objects) {
+foreach ($Object in $Objects)
+{
     $LocalFileName = $Object.Key
-    if ($LocalFileName -ne '' -and $Object.Size -ne 0) {
+    if ($LocalFileName -ne '' -and $Object.Size -ne 0)
+    {
         $LocalFilePath = Join-Path "$InstallationFilesFolder\1_NVIDIA_drivers" $LocalFileName
         Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1
     }
@@ -74,11 +76,7 @@ Rename-Computer -NewName "CLOUD-TD"
 # Reboot the system
 Restart-Computer -Force
 
-# Check DCV sessions and signal CloudFormation
-Start-Sleep -Seconds 5
-& "C:\Program Files\NICE\DCV\Server\bin\dcv.exe" list-sessions
-cfn-signal.exe -e $LASTEXITCODE --resource EC2Instance --stack YOUR_STACK_ID --region YOUR_REGION
-
+# keep the configset that checks connections, signals, and restarts because it depends on the stack name.
 
 
 # TODO

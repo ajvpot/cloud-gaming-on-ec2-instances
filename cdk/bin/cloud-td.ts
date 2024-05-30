@@ -9,9 +9,9 @@ const app = new cdk.App();
 
 const NICE_DCV_DISPLAY_DRIVER_URL =
   "https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-virtual-display-x64-Release.msi";
+//const NICE_DCV_SERVER_URL = "https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-server-x64-Release.msi";
 const NICE_DCV_SERVER_URL =
-  "https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-server-x64-Release.msi";
-//const NICE_DCV_SERVER_URL = 'https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi'; // known good
+  "https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi"; // known good
 const GRID_SW_CERT_URL =
   "https://nvidia-gaming.s3.amazonaws.com/GridSwCert-Archive/GridSwCertWindows_2021_10_2.cert";
 const CHROME_URL =

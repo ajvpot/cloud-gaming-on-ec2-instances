@@ -135,21 +135,20 @@ export default function Home() {
                     : "This virtual workstation is currently in a pending state and may not be available for use."}
               </p>
               <div className="flex justify-end space-x-2">
-                {status.state === "running" ||
-                  (status.state === "pending" && (
-                    <>
-                      {status.password ? (
-                        <>Loading...</>
-                      ) : (
-                        <Button
-                          color="primary"
-                          onClick={() => handleConnect(status.instanceId)}
-                        >
-                          Connect
-                        </Button>
-                      )}
-                    </>
-                  ))}
+                {(status.state === "running" || status.state === "pending") && (
+                  <>
+                    {status.password ? (
+                      <>Loading...</>
+                    ) : (
+                      <Button
+                        color="primary"
+                        onClick={() => handleConnect(status.instanceId)}
+                      >
+                        Connect
+                      </Button>
+                    )}
+                  </>
+                )}
                 {status.state === "running" && (
                   <Button
                     color="danger"

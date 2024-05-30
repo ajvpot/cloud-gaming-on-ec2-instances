@@ -49,19 +49,29 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <h1>EC2 Control</h1>
-      <button onClick={() => handleAction("start")} disabled={loading}>
-        Start Instances
-      </button>
-      <button onClick={() => handleAction("stop")} disabled={loading}>
-        Stop Instances
-      </button>
-      {message && <p>{message}</p>}
-      <h2>Instance Statuses</h2>
-      <ul>
+    <div className="p-6 max-w-lg mx-auto bg-white rounded-xl shadow-md space-y-4">
+      <h1 className="text-2xl font-bold text-center">EC2 Control</h1>
+      <div className="flex justify-center space-x-4">
+        <button
+          onClick={() => handleAction("start")}
+          disabled={loading}
+          className={`px-4 py-2 bg-green-500 text-white rounded-md ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"}`}
+        >
+          Start Instances
+        </button>
+        <button
+          onClick={() => handleAction("stop")}
+          disabled={loading}
+          className={`px-4 py-2 bg-red-500 text-white rounded-md ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-red-600"}`}
+        >
+          Stop Instances
+        </button>
+      </div>
+      {message && <p className="text-center text-gray-700">{message}</p>}
+      <h2 className="text-xl font-semibold">Instance Statuses</h2>
+      <ul className="list-disc list-inside space-y-2">
         {statuses.map((status) => (
-          <li key={status.instanceId}>
+          <li key={status.instanceId} className="text-gray-700">
             {status.instanceId}: {status.state}
           </li>
         ))}

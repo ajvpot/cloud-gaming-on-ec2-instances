@@ -28,7 +28,6 @@ export async function getPassword(
   instanceId: string,
 ): Promise<{ message: string; password?: string }> {
   try {
-    await stopInstances(process.env.STACK_NAME!);
     return {
       message: "Password decrypted successfully",
       password: await getDecryptedPassword(instanceId),

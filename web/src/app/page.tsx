@@ -104,10 +104,7 @@ export default function Home() {
         {statuses.map((status) => (
           <li key={status.instanceId} className="text-gray-700">
             {status.instanceId}: {status.state}
-            <button onClick={() => handleGetPassword(status.instanceId)}>
-              Get Password
-            </button>
-            {status.password && (
+            {(status.password && (
               <>
                 <p>Password: {status.password}</p>
 
@@ -121,6 +118,10 @@ export default function Home() {
                   Connect
                 </a>
               </>
+            )) || (
+              <button onClick={() => handleGetPassword(status.instanceId)}>
+                Get Password
+              </button>
             )}
           </li>
         ))}

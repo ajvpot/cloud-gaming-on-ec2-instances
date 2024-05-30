@@ -150,3 +150,7 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
+
+
+
+http://localhost:3000/connect#server=https%3A%2F%2F35.82.217.196%3A8443&username=Administrator&password=asdf

@@ -79,6 +79,9 @@ export abstract class BaseEc2Stack extends cdk.Stack {
           description: 'ENI',
           groups: [securityGroup.securityGroupId],
         }],
+        hibernationOptions: {
+          configured: true
+        }
       },
       launchTemplateName: `${id}InstanceLaunchTemplate/${this.getInstanceType().toString()}`,
     });

@@ -11,7 +11,6 @@
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.583.0",
     "@aws-sdk/client-ec2": "^3.585.0",
-    "aws-sdk": "^2.1630.0",
     "next": "14.2.3",
     "prettier": "^3.2.5",
     "react": "^18",

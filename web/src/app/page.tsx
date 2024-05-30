@@ -148,15 +148,17 @@ export default function Home() {
                           Connect
                         </Button>
                       )}
-                      <Button
-                        color="danger"
-                        onClick={() => handleAction("stop")}
-                        disabled={loading}
-                      >
-                        Stop
-                      </Button>
                     </>
                   ))}
+                {status.state === "running" && (
+                  <Button
+                    color="danger"
+                    onClick={() => handleAction("stop")}
+                    disabled={loading}
+                  >
+                    Stop
+                  </Button>
+                )}
                 {status.state === "stopped" && (
                   <Button
                     color="success"

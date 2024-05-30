@@ -1,5 +1,7 @@
+import forge from "node-forge";
 import {
   EC2Client,
+  GetPasswordDataCommand,
   StartInstancesCommand,
   StopInstancesCommand,
   DescribeInstanceStatusCommand,
@@ -91,4 +93,29 @@ export async function getInstanceStatuses(
   })).filter(
     (status) => status.instanceId !== undefined && status.state !== undefined,
   );
+}
+
+// Function to get the encrypted password data
+export async function getDecryptedPassword(
+  instanceId: string,
+): Promise<string | undefined> {
+  const command = new GetPasswordDataCommand({ InstanceId: instanceId });
+  const response = await ec2Client.send(command);
+  if (!response.PasswordData) return;
+  return decryptPassword(response.PasswordData);
+}
+
+// Function to decrypt the password
+export function decryptPassword(encryptedPassword: string): string {
+  if (!process.env.AWS_EC2_KEY) {
+    throw new Error("AWS_EC2_KEY is not set");
+  }
+  const privateKeyPem = process.env.AWS_EC2_KEY;
+  const privateKey = forge.pki.privateKeyFromPem(privateKeyPem);
+  const buffer = Buffer.from(encryptedPassword, "base64");
+  const decrypted = privateKey.decrypt(
+    buffer.toString("binary"),
+    "RSAES-PKCS1-V1_5",
+  );
+  return decrypted;
 }

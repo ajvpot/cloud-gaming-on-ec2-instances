@@ -1,11 +1,13 @@
 "use client";
 
+import { Button, Card, Spacer, Progress } from "@nextui-org/react";
 import { useState, useEffect } from "react";
-import { startEC2Instances, stopEC2Instances } from "./actions";
+import { getPassword, startEC2Instances, stopEC2Instances } from "./actions";
 
 interface InstanceStatus {
   instanceId: string;
   state: string;
+  password?: string;
 }
 
 export default function Home() {
@@ -48,6 +50,21 @@ export default function Home() {
     }
   };
 
+  const handleGetPassword = async (instanceId: string) => {
+    const res = await getPassword(instanceId);
+
+    if (res) {
+      if (res.message) setMessage(res.message);
+      setStatuses((prevStatuses) =>
+        prevStatuses.map((status) =>
+          status.instanceId === instanceId
+            ? { ...status, password: res.password }
+            : status,
+        ),
+      );
+    }
+  };
+
   return (
     <div className="p-6 max-w-lg mx-auto bg-white rounded-xl shadow-md space-y-4">
       <h1 className="text-2xl font-bold text-center">EC2 Control</h1>
@@ -73,6 +90,10 @@ export default function Home() {
         {statuses.map((status) => (
           <li key={status.instanceId} className="text-gray-700">
             {status.instanceId}: {status.state}
+            <button onClick={() => handleGetPassword(status.instanceId)}>
+              Get Password
+            </button>
+            {status.password && <p>Password: {status.password}</p>}
           </li>
         ))}
       </ul>

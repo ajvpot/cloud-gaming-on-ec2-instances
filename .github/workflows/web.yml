@@ -1,0 +1,48 @@
+name: Web
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - staging
+  pull_request:
+
+permissions: write-all
+
+jobs:
+  build:
+    runs-on: self-hosted
+    permissions: write-all
+    container:
+      image: ubuntu
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./web/package-lock.json
+
+      - name: Build website
+        run: |
+          cd web
+          npx @cloudflare/next-on-pages
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: 242c8a7852c1eb2ae41987df5923a465
+          projectName: cloudtd
+          workingDirectory: web/.vercel/output/static
+          directory: .
+          branch: ${{ github.head_ref }}
+          # Optional: Enable this if you want to have GitHub Deployments triggered
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: Change the Wrangler version, allows you to point to a specific version or a tag such as `beta`
+          wranglerVersion: '3'

@@ -5,7 +5,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import dcv from "https://assets-oh3.pages.dev/dcvjs-esm/dcv.js";
 
 import "@cloudscape-design/global-styles/index.css";
-import { DCVViewer } from "@/vendor/dcv-ui/dcv-ui.js";
+import { DCVViewer } from "https://assets-oh3.pages.dev/dcv-ui/dcv-ui.js";
 import useHash from "@/lib/useHash";
 
 const LOG_LEVEL = dcv.LogLevel.INFO;

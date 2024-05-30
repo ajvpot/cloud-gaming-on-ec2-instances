@@ -1,4 +1,5 @@
 {
-  "https://assets-oh3.pages.dev/dcvjs-esm/dcv.js": { "integrity": "sha512-hDXRaOFK7l3E3C78G2YrnhhQKjG3dSOXtxdhSlhaQEact2K2UuIY50A+HKRCWziUHqi4gzPAv1pgTCg9I5P7Ng==", "contentType": "text/javascript; charset=utf-8" },
+  "https://assets-oh3.pages.dev/dcv-ui/dcv-ui.js": { "integrity": "sha512-AkTlXSzEjf8gE8oSQUW78WG76eA7gCrDGIH63Np9nG3dBNBkD7MPFoujpTQbrMr7cKBxluoAW2FQEprFBG9A1g==", "contentType": "text/javascript; charset=utf-8" },
+  "https://assets-oh3.pages.dev/dcvjs-esm/dcv.js": { "integrity": "sha512-nO3uZkeOzgh8oXhPWiGtRH8Btt56QQrYnjIo972HccWwjQenriZNhcWlijFO/8UOVTx8FS4GH5PdAXcA5Oxjwg==", "contentType": "text/javascript; charset=utf-8" },
   "version": 1
 }

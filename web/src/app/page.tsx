@@ -15,7 +15,7 @@ export default function Home() {
 
   const fetchStatuses = async () => {
     try {
-      const response = await fetch("/api/instance-statuses");
+      const response = await fetch("/api/instance-status");
       const data = await response.json();
       setStatuses(data);
     } catch (error) {

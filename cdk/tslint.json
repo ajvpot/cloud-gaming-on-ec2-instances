@@ -10,11 +10,14 @@
     "no-parameter-properties": false,
     "no-parameter-reassignment": false,
     "no-implicit-dependencies": false,
-    "no-unnecessary-class": ["allow-empty-class", "allow-constructor-only"],
-    "file-name-casing":  false,
+    "no-unnecessary-class": [
+      "allow-empty-class",
+      "allow-constructor-only"
+    ],
+    "file-name-casing": false,
     "object-literal-sort-keys": false,
     "max-line-length": false,
-    "whitespace":  false,
+    "whitespace": false,
     "no-unused-variable": false,
     "no-var-requires": false,
     "no-console": false,
@@ -33,7 +36,6 @@
         "allow-named-functions"
       ]
     },
-
     "completed-docs": false,
     "no-any": false,
     "no-magic-numbers": false,

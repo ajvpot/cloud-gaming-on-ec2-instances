@@ -1,9 +1,8 @@
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as cdk from "aws-cdk-lib";
 import "source-map-support/register";
-import { G4DNStack } from "../lib/g4dn";
-import { G4ADStack } from "../lib/g4ad";
 import { G5Stack } from "../lib/g5";
+import { G6Stack } from "../lib/g6";
 
 const app = new cdk.App();
 
@@ -31,7 +30,7 @@ const ALLOW_INBOUND_CIDR = "0.0.0.0/0";
 const ACCOUNT_ID = "471112955109";
 const REGION = "us-west-2";
 
-new G5Stack(app, "CloudTD2", {
+new G6Stack(app, "CloudTD2", {
   niceDCVDisplayDriverUrl: NICE_DCV_DISPLAY_DRIVER_URL,
   niceDCVServerUrl: NICE_DCV_SERVER_URL,
   sevenZipUrl: SEVEN_ZIP_URL,
@@ -53,4 +52,5 @@ new G5Stack(app, "CloudTD2", {
   tdUrl: TD_URL,
   cudaUrl: CUDA_URL,
   pythonUrl: PYTHON_URL,
+  availabilityZone: "c",
 });

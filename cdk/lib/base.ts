@@ -22,6 +22,8 @@ export interface BaseConfig extends cdk.StackProps {
   tdUrl: string;
   pythonUrl: string;
   cudaUrl: string;
+
+  availabilityZone: string;
 }
 
 export abstract class BaseEc2Stack extends cdk.Stack {
@@ -33,7 +35,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
 
     const vpc = new ec2.Vpc(this, `${id}VPC`, {
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
-      maxAzs: 1,
+      availabilityZones: [`${this.region}${this.props.availabilityZone}`],
       subnetConfiguration: [
         {
           cidrMask: 28,
@@ -103,6 +105,7 @@ export abstract class BaseEc2Stack extends cdk.Stack {
 
     const ec2Instance = new ec2.Instance(this, `${id}InstanceMain`, {
       instanceType: this.getInstanceType(),
+      availabilityZone: `${this.region}${this.props.availabilityZone}`,
       vpc,
       securityGroup,
       vpcSubnets: vpc.selectSubnets({ subnetType: ec2.SubnetType.PUBLIC }),

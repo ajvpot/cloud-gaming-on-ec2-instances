@@ -1,20 +1,22 @@
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { Construct } from "constructs";
 import { BaseConfig, BaseEc2Stack } from "./base";
+import { InstanceType } from "aws-cdk-lib/aws-ec2";
 
-export interface G4DNConfig extends BaseConfig {
+export interface G6Config extends BaseConfig {
   gridSwCertUrl: string;
 }
 
-export class G4DNStack extends BaseEc2Stack {
-  protected props: G4DNConfig;
+export class G6Stack extends BaseEc2Stack {
+  protected props: G6Config;
 
-  constructor(scope: Construct, id: string, props: G4DNConfig) {
+  constructor(scope: Construct, id: string, props: G6Config) {
     super(scope, id, props);
   }
 
   protected getInstanceType() {
-    return ec2.InstanceType.of(ec2.InstanceClass.G4DN, this.props.instanceSize);
+    // workaround: cdk does not have this instance type
+    return new InstanceType(`g6.${this.props.instanceSize}`);
   }
 
   protected getMachineImage() {

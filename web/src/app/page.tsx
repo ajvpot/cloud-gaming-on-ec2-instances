@@ -119,6 +119,7 @@ export default function Home() {
           <p className="text-gray-400">
             Start, stop, and connect to your virtual workstations.
           </p>
+          {message && <p className={"text-gray-400"}>{message}</p>}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
           {statuses.map((status) => (

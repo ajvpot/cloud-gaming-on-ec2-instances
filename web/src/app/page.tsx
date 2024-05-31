@@ -28,6 +28,14 @@ function encodeToUrlParams(record: Record<string, any>): string {
   return params.toString();
 }
 
+const gpuTypes = new Map({
+  g5: "NVIDIA A10G",
+  g6: "NVIDIA L4",
+});
+function displayInstanceType(instanceType: string): string {
+  return `${gpuTypes.get(instanceType.split(".")[0])} ${instanceType.split(".")[1]}`;
+}
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -122,7 +130,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-gray-400 mb-2">
-                {status.type}
+                {displayInstanceType(status.type)}
                 <br />
                 IP Address:{" "}
                 <a href={`https://${status.publicIp}:8443`}>

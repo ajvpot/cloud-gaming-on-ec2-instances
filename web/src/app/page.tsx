@@ -28,12 +28,14 @@ function encodeToUrlParams(record: Record<string, any>): string {
   return params.toString();
 }
 
-const gpuTypes = new Map({
+const gpuTypes: { [key: string]: string } = {
   g5: "NVIDIA A10G",
   g6: "NVIDIA L4",
-});
+};
+
 function displayInstanceType(instanceType: string): string {
-  return `${gpuTypes.get(instanceType.split(".")[0])} ${instanceType.split(".")[1]}`;
+  const [type, subtype] = instanceType.split(".");
+  return `${gpuTypes[type] || ""} ${subtype || ""}`;
 }
 
 export default function Home() {

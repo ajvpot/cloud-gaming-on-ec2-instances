@@ -96,7 +96,7 @@ export async function getInstanceStatuses(stackName: string) {
         state: instance.State?.Name || "unknown",
         publicIp: elasticIp || instance.PublicIpAddress,
         type: instance.InstanceType!,
-        name: instance.KeyName!,
+        name: "Workspace",
       });
     }
   }

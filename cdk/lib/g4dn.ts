@@ -2,9 +2,7 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { Construct } from "constructs";
 import { BaseConfig, BaseEc2Stack } from "./base";
 
-export interface G4DNConfig extends BaseConfig {
-  gridSwCertUrl: string;
-}
+export interface G4DNConfig extends BaseConfig {}
 
 export class G4DNStack extends BaseEc2Stack {
   protected props: G4DNConfig;

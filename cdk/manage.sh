@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-STACK_NAME="CloudTD2"
+STACK_NAME="CloudTD"
 INSTANCE_ID=$(aws cloudformation describe-stack-resources --stack-name $STACK_NAME --query "StackResources[?ResourceType=='AWS::EC2::Instance'].PhysicalResourceId" --output text)
 INSTANCE_IP=$(aws ec2 describe-instances --instance-ids "$INSTANCE_ID" --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
 PASSWORD=$(aws ec2 get-password-data --instance-id "$INSTANCE_ID" --priv-launch-key GamingOnEc2.pem --query PasswordData --output text)

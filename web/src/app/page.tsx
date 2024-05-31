@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 interface InstanceStatus {
   instanceId: string;
   state: string;
+  type: string;
+  name: string;
   publicIp?: string;
   password?: string;
 }
@@ -112,9 +114,7 @@ export default function Home() {
           {statuses.map((status) => (
             <div key={status.instanceId} className="bg-gray-800 p-4 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-medium">
-                  Workstation {status.instanceId}
-                </h3>
+                <h3 className="text-lg font-medium">{status.name}</h3>
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${status.state === "running" ? "bg-green-500" : status.state === "stopped" ? "bg-red-500" : "bg-yellow-500"} text-white`}
                 >

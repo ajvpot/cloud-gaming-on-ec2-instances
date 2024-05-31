@@ -78,6 +78,8 @@ export async function getInstanceStatuses(stackName: string) {
   const instanceStatuses: {
     instanceId: string;
     state: string;
+    type: string;
+    name: string;
     publicIp?: string;
   }[] = [];
 
@@ -93,6 +95,8 @@ export async function getInstanceStatuses(stackName: string) {
         instanceId: instance.InstanceId!,
         state: instance.State?.Name || "unknown",
         publicIp: elasticIp || instance.PublicIpAddress,
+        type: instance.InstanceType!,
+        name: instance.KeyName!,
       });
     }
   }

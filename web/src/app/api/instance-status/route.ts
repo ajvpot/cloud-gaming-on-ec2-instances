@@ -1,15 +1,10 @@
 import { NextResponse } from "next/server";
 import { getInstanceStatuses } from "@/lib/ec2Actions";
+import { getStackNameForUser } from "@/lib/kv";
 
 export async function GET() {
   try {
-    const stackName = process.env.STACK_NAME;
-    if (!stackName) {
-      return NextResponse.json(
-        { error: "STACK_NAME is not set" },
-        { status: 400 },
-      );
-    }
+    const stackName = await getStackNameForUser();
 
     const statuses = await getInstanceStatuses(stackName);
     return NextResponse.json(statuses, { status: 200 });

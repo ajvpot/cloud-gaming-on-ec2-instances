@@ -25,37 +25,39 @@ reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\display" /v
 reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\session-management\automatic-console-session" /v owner /t REG_SZ /d Administrator /f
 reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\connectivity" /v enable-quic-frontend /t REG_DWORD /d 1 /f
 
-# Download GRID Certificate
-Invoke-WebRequest -Uri $gridSwCertUrl -OutFile "C:\Users\PUBLIC\Documents\GridSwCert.txt"
+# Install GRID driver.
+# Create a temporary directory and change to it
+$tempDir = New-Item -ItemType Directory -Path ([System.IO.Path]::GetTempPath()) -Name "NvidiaDriverTemp"
+Set-Location -Path $tempDir.FullName
 
-# Download and install NVIDIA drivers
-$InstallationFilesFolder = "C:\Users\Administrator\Desktop\InstallationFiles"
-$Bucket = "nvidia-gaming"
-$KeyPrefix = "windows/latest"
-$Objects = Get-S3Object -BucketName $Bucket -KeyPrefix $KeyPrefix -Region us-east-1
+# Define the AWS CLI path
+$awsCliPath = "C:\Program Files\Amazon\AWSCLIV2\aws"
 
-foreach ($Object in $Objects)
-{
-    $LocalFileName = $Object.Key
-    if ($LocalFileName -ne '' -and $Object.Size -ne 0)
-    {
-        $LocalFilePath = Join-Path "$InstallationFilesFolder\1_NVIDIA_drivers" $LocalFileName
-        Copy-S3Object -BucketName $Bucket -Key $Object.Key -LocalFile $LocalFilePath -Region us-east-1
+# Attempt to copy NVIDIA drivers from S3 bucket
+try {
+    & $awsCliPath s3 cp --recursive s3://ec2-windows-nvidia-drivers/latest/ .
+} catch {
+    try {
+        & $awsCliPath s3 cp --recursive s3://ec2-windows-nvidia-drivers/latest/ . --region us-east-1
+    } catch {
+        & $awsCliPath s3 cp --recursive s3://ec2-windows-nvidia-drivers/latest/ . --no-sign-request
     }
 }
 
-$extractFolder = "$InstallationFilesFolder\1_NVIDIA_drivers\windows\latest"
-$filesToExtract = "Display.Driver HDAudio NVI2 PhysX EULA.txt ListDevices.txt setup.cfg setup.exe"
-Start-Process -FilePath "C:\Program Files\7-Zip\7z.exe" -ArgumentList "x -bso0 -bsp1 -bse1 -aoa $LocalFilePath $filesToExtract -o$extractFolder" -Wait
+# Add registry entry to disable NVIDIA license management page
+reg add "HKLM\SOFTWARE\NVIDIA Corporation\Global\GridLicensing" /v NvCplDisableManageLicensePage /t REG_DWORD /d 1 /f
 
-(Get-Content "$extractFolder\setup.cfg") | Where-Object { $_ -notmatch 'name="${{(EulaHtmlFile|FunctionalConsentFile|PrivacyPolicyFile)}}' } | Set-Content "$extractFolder\setup.cfg" -Encoding UTF8 -Force
+# Extract all .exe files using 7-Zip from the system path
+Get-ChildItem -Filter *.exe | ForEach-Object {
+    Start-Process -FilePath "7z" -ArgumentList "x", $_.FullName -Wait
+}
 
-$install_args = '-passive -noreboot -noeula -nofinish -s'
-Start-Process -FilePath "$extractFolder\setup.exe" -ArgumentList $install_args -Wait
+# Run the setup.exe with silent mode
+Start-Process -FilePath ".\setup.exe" -ArgumentList "-s" -Wait
 
 # Disable ECC Checking and set clock speed
 & "C:\Windows\System32\DriverStore\FileRepository\nvg*\nvidia-smi.exe" -e 0
-& "C:\Windows\System32\DriverStore\FileRepository\nvg*\nvidia-smi.exe" -ac 6250,1710
+# & "C:\Windows\System32\DriverStore\FileRepository\nvg*\nvidia-smi.exe" -ac 6250,1710
 
 # Download and install user space applications
 Invoke-WebRequest -Uri "https://github.com/ajvpot/Parsec-Cloud-Preparation-Tool/archive/master.zip" -OutFile "$InstallationFilesFolder\9_user\parsec.zip"
@@ -66,18 +68,12 @@ powershell.exe .\Loader.ps1 -DontPromptPasswordUpdateGPU
 Invoke-WebRequest -Uri $cudaUrl -OutFile "$InstallationFilesFolder\9_user\cuda.exe"
 Invoke-WebRequest -Uri $pythonUrl -OutFile "$InstallationFilesFolder\9_user\python.exe"
 Invoke-WebRequest -Uri $tdUrl -OutFile "$InstallationFilesFolder\9_user\td.exe"
-Invoke-WebRequest -Uri "https://downloads.ndi.tv/Tools/NDI%206%20Tools.exe" -OutFile "$InstallationFilesFolder\9_user\ndi.exe"
+Invoke-WebRequest -Uri "https://downloads.ndi.tv/Tools/NDI%206%20Tools.exe" -OutFile "$InstallationFilesFolder\9_user\NDI 6 Tools.exe"
 
 Start-Process -FilePath "$InstallationFilesFolder\9_user\cuda.exe" -ArgumentList "-s" -Wait -NoNewWindow
 Start-Process -FilePath "$InstallationFilesFolder\9_user\python.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0" -Wait -NoNewWindow
 Start-Process -FilePath "$InstallationFilesFolder\9_user\td.exe" -ArgumentList "/VERYSILENT /Codemeter" -Wait -NoNewWindow
 Rename-Computer -NewName "CLOUD-TD"
-
-# Reboot the system
-Restart-Computer -Force
-
-# keep the configset that checks connections, signals, and restarts because it depends on the stack name.
-
 
 # TODO
 #   create shortcut for log tail, remove it when install is done

@@ -1,12 +1,22 @@
 # Define URLs
-$sevenZipUrl = "YOUR_SEVEN_ZIP_URL"
-$chromeUrl = "YOUR_CHROME_URL"
-$niceDCVServerUrl = "YOUR_NICE_DCV_SERVER_URL"
-$niceDCVDisplayDriverUrl = "YOUR_NICE_DCV_DISPLAY_DRIVER_URL"
-$gridSwCertUrl = "YOUR_GRID_SW_CERT_URL"
-$cudaUrl = "YOUR_CUDA_URL"
-$pythonUrl = "YOUR_PYTHON_URL"
-$tdUrl = "YOUR_TD_URL"
+$sevenZipUrl = "https://www.7-zip.org/a/7z2201-x64.msi"
+$chromeUrl = "https://dl.google.com/tag/s/appname=Google%20Chrome&needsadmin=true&ap=x64-stable-statsdef_0&brand=GCEA/dl/chrome/install/googlechromestandaloneenterprise64.msi"
+$niceDCVServerUrl = "https://d1uj6qtbmh3dt5.cloudfront.net/2023.0/Servers/nice-dcv-server-x64-Release-2023.0-15487.msi"
+$niceDCVDisplayDriverUrl = "https://d1uj6qtbmh3dt5.cloudfront.net/nice-dcv-virtual-display-x64-Release.msi"
+$gridSwCertUrl = "https://nvidia-gaming.s3.amazonaws.com/GridSwCert-Archive/GridSwCertWindows_2021_10_2.cert"
+$cudaUrl = "https://developer.download.nvidia.com/compute/cuda/12.1.0/local_installers/cuda_12.1.0_531.14_windows.exe"
+$pythonUrl = "https://www.python.org/ftp/python/3.10.0/python-3.10.0-amd64.exe"
+$tdUrl = "https://download.derivative.ca/TouchDesigner.2023.11760.exe"
+
+# Setup logtail shortcut
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut("$env:USERPROFILE\Desktop\TailCloudFormationInitLog.lnk")
+$Shortcut.TargetPath = "powershell.exe"
+$Shortcut.Arguments = "-NoExit -Command Get-Content C:\cfn\log\cfn-init.log -Wait"
+$Shortcut.WorkingDirectory = "$env:USERPROFILE\Desktop"
+$Shortcut.WindowStyle = 1
+$Shortcut.IconLocation = "powershell.exe,0"
+$Shortcut.Save()
 
 # Install 7zip and Chrome Enterprise
 Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $sevenZipUrl /quiet /norestart" -Wait
@@ -24,6 +34,10 @@ reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\display" /v
 reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\display" /v frame-queue-weights /t REG_DWORD /d 851 /f
 reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\session-management\automatic-console-session" /v owner /t REG_SZ /d Administrator /f
 reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\connectivity" /v enable-quic-frontend /t REG_DWORD /d 1 /f
+
+# Set up shared storage
+New-Item -Path "%home%\Desktop\Shared\" -ItemType Directory -Force
+reg add "HKEY_USERS\S-1-5-18\Software\GSettings\com\nicesoftware\dcv\session-management\automatic-console-session" /v storage-root /t REG_SZ /d "%home%\Desktop\Shared\" /f
 
 # Install GRID driver.
 # Create a temporary directory and change to it
@@ -73,7 +87,9 @@ Invoke-WebRequest -Uri "https://downloads.ndi.tv/Tools/NDI%206%20Tools.exe" -Out
 Start-Process -FilePath "$InstallationFilesFolder\9_user\cuda.exe" -ArgumentList "-s" -Wait -NoNewWindow
 Start-Process -FilePath "$InstallationFilesFolder\9_user\python.exe" -ArgumentList "/quiet InstallAllUsers=1 PrependPath=1 Include_test=0" -Wait -NoNewWindow
 Start-Process -FilePath "$InstallationFilesFolder\9_user\td.exe" -ArgumentList "/VERYSILENT /Codemeter" -Wait -NoNewWindow
+Start-Process -FilePath "$InstallationFilesFolder\9_user\NDI 6 Tools.exe" -ArgumentList "/VERYSILENT", "/LOADINF=ndiconfig" -Wait -NoNewWindow
 Rename-Computer -NewName "CLOUD-TD"
+Remove-Item "$env:USERPROFILE\Desktop\TailCloudFormationInitLog.lnk"
 
 # TODO
 #   create shortcut for log tail, remove it when install is done

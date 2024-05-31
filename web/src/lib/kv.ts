@@ -12,7 +12,7 @@ async function getStackNameFromKV(email: string): Promise<string> {
 
 function getEmail() {
   if (process.env.NODE_ENV == "development") {
-    return "alex@vanderpot.com";
+    return "developer";
   }
   const email = headers().get("Cf-Access-Authenticated-User-Email");
   if (!email) {

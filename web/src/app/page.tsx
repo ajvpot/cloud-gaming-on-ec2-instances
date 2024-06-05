@@ -47,7 +47,7 @@ export default function Home() {
 
   const fetchStatuses = async () => {
     try {
-      const response = await fetch("/app/api/instance-status");
+      const response = await fetch("/api/instance-status");
       const data = await response.json();
       setStatuses(data);
     } catch (error) {
@@ -86,7 +86,7 @@ export default function Home() {
     const password = await handleGetPassword(instanceId);
     if (status && password) {
       router.push(
-        `/panel/connect#${encodeToUrlParams({
+        `/connect#${encodeToUrlParams({
           username: "Administrator",
           server: `https://${status.publicIp}:8443`,
           password: password,

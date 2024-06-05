@@ -14,13 +14,6 @@ Welcome to **RenderLab.app**, the ultimate solution for artists, designers, and 
 - **Video Streaming Options**: Stream video in and out via NDI and other network video protocols, perfect for live performances and collaborative projects.
 - **Application Support**: Run industry-standard applications like TouchDesigner and ComfyUI effortlessly.
 
-### Why Choose RenderLab.app?
-
-- **Scalability**: Easily scale your resources up or down based on your project needs.
-- **Reliability**: Our infrastructure ensures your workstations are always available and performing at their best.
-- **Security**: Protect your data with our robust security measures and encryption protocols.
-- **Cost-Effective**: Pay only for what you use, making it an economical choice for freelancers and large teams alike.
-
 ### Smart Financial Choice
 
 Investing in physical GPUs for onsite use can be a significant expense. With **RenderLab.app**, you can avoid large upfront costs by subscribing to our service. This means:
@@ -37,7 +30,7 @@ Our virtual workstations are perfect for generating graphics for real-time inter
 
 Ready to revolutionize your creative process? Sign up for a free trial and discover how RenderLab.app can elevate your projects to new heights.
 
-[Log In to Your Workstation](/app)
+[Log In to Your Workstation](https://my.renderlab.app/)
 
 ---
 

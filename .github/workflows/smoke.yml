@@ -1,0 +1,34 @@
+name: Build and Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'smoke/**'
+      - '.github/**'
+  pull_request:
+    paths:
+      - 'smoke/**'
+      - '.github/**'
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      deployments: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and Deploy with Eleventy and Cloudflare Pages
+        uses: ajvpot/cloudflare-pages-markdown-action@main
+        with:
+          build_folder: 'smoke'
+          project_name: 'cloudtd-smoke'
+          account_id: 242c8a7852c1eb2ae41987df5923a465
+          api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

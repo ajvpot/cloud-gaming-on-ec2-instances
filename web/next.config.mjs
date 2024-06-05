@@ -1,7 +1,10 @@
+import withMDX from '@next/mdx';
 import { setupDevBindings } from '@cloudflare/next-on-pages/next-dev';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Configure `pageExtensions` to include MDX files
+    pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
     experimental: {
         urlImports: ['https://assets-oh3.pages.dev/'],
     },
@@ -19,4 +22,4 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 
-export default nextConfig;
+export default withMDX()(nextConfig);

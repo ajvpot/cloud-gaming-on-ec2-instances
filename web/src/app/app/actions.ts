@@ -4,7 +4,7 @@ import {
   getDecryptedPassword,
   startInstances,
   stopInstances,
-} from "../lib/ec2Actions";
+} from "@/lib/ec2Actions";
 import { getStackNameForUser } from "@/lib/kv";
 
 export async function startEC2Instances(): Promise<{ message: string }> {

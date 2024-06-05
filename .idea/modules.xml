@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/cloud-gaming-on-ec2-instances.iml" filepath="$PROJECT_DIR$/.idea/cloud-gaming-on-ec2-instances.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/cloud-td.iml" filepath="$PROJECT_DIR$/.idea/cloud-td.iml" />
     </modules>
   </component>
 </project>

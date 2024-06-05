@@ -41,13 +41,13 @@ function displayInstanceType(instanceType: string): string {
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [statuses, setStatuses] = useState<InstanceStatus[]>([]);
+  const [statuses, setStatuses] = useState<InstanceStatus[] | undefined>();
 
   const router = useRouter();
 
   const fetchStatuses = async () => {
     try {
-      const response = await fetch("/api/instance-status");
+      const response = await fetch("/app/api/instance-status");
       const data = await response.json();
       setStatuses(data);
     } catch (error) {
@@ -86,7 +86,7 @@ export default function Home() {
     const password = await handleGetPassword(instanceId);
     if (status && password) {
       router.push(
-        `/connect#${encodeToUrlParams({
+        `/panel/connect#${encodeToUrlParams({
           username: "Administrator",
           server: `https://${status.publicIp}:8443`,
           password: password,
@@ -101,7 +101,7 @@ export default function Home() {
     if (res) {
       if (res.message) setMessage(res.message);
       setStatuses((prevStatuses) =>
-        prevStatuses.map((status) =>
+        prevStatuses?.map((status) =>
           status.instanceId === instanceId
             ? { ...status, password: res.password }
             : status,
@@ -122,7 +122,7 @@ export default function Home() {
           {message && <p className={"text-gray-400"}>{message}</p>}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-6">
-          {statuses.map((status) => (
+          {statuses?.length && statuses.map((status) => (
             <div key={status.instanceId} className="bg-gray-800 p-4 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-medium">{status.name}</h3>

@@ -82,7 +82,7 @@ export default function Home() {
   };
 
   const handleConnect = async (instanceId: string) => {
-    const status = statuses.find((status) => status.instanceId === instanceId);
+    const status = statuses?.find((status) => status.instanceId === instanceId);
     const password = await handleGetPassword(instanceId);
     if (status && password) {
       router.push(
